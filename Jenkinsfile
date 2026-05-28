@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush() // auto trigger setiap push ke GitHub
+    }
+
+    environment {
+        CI = 'true' // headless mode
+    }
+
     stages {
 
         stage('Checkout') {
@@ -11,7 +19,6 @@ pipeline {
 
         stage('Setup ENV') {
             steps {
-                // Ambil file .env dari Jenkins credentials → copy ke workspace
                 withCredentials([file(credentialsId: 'ecommerce-env', variable: 'ENV_FILE')]) {
                     bat 'copy %ENV_FILE% .env'
                 }
@@ -27,7 +34,20 @@ pipeline {
 
         stage('Run Playwright Tests') {
             steps {
-                bat 'npx playwright test'
+                bat 'npx playwright test --reporter=html'
+            }
+        }
+
+        stage('Publish Report') {
+            steps {
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Report'
+                ])
             }
         }
 
