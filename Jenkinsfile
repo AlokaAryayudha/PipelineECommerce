@@ -1,8 +1,12 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS'
+
+
+    environment {
+        BASE_URL      = 'https://automationexercise.com'
+        USER_EMAIL    = credentials('ecommerce-env')
+        API_BASE_URL  = 'https://automationexercise.com/api'
     }
 
     stages {
