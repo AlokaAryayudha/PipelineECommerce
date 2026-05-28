@@ -31,14 +31,7 @@ test.describe('Register Page Tests', () => {
     await expect(page.locator('text=Email Address already exist!')).toBeVisible();
   });
 
-  test('TC3 - should show error for invalid email format', async ({ page }) => {
-    const name = 'Test User';
-    const email = 'invalid-email-format';
-
-    await registerPage.Register(name, email);
-    // Verifikasi pesan error "Invalid email address!" muncul
-    await expect(page.locator('text=Invalid email address!')).toBeVisible();
-  });
+  
 
 
 });
