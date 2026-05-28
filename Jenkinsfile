@@ -1,19 +1,20 @@
 pipeline {
     agent any
 
-
-
-    environment {
-        BASE_URL      = 'https://automationexercise.com'
-        USER_EMAIL    = credentials('ecommerce-env')
-        API_BASE_URL  = 'https://automationexercise.com/api'
-    }
-
     stages {
 
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Setup ENV') {
+            steps {
+                // Ambil file .env dari Jenkins credentials → copy ke workspace
+                withCredentials([file(credentialsId: 'ecommerce-env', variable: 'ENV_FILE')]) {
+                    bat 'copy %ENV_FILE% .env'
+                }
             }
         }
 
