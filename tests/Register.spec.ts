@@ -20,13 +20,13 @@ test.describe('Register Page Tests', () => {
     await page.pause()
   });
 
-  test.only('TC2 - should show error for existing email', async ({ page }) => {
+  test('TC2 - should show error for existing email', async ({ page }) => {
     const name = 'Test User';
     const email = process.env.USER_EMAIL!; 
 
     await registerPage.Register(name, email);
 
-    // Verifikasi pesan error muncul
+    
     await expect(page.locator('text=Email Address already exist!')).toBeVisible();
   });
 
