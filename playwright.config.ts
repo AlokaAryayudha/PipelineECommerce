@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import path from 'path';
+
 
 /**
  * Read environment variables from file.
@@ -13,7 +13,7 @@ import path from 'path';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
@@ -30,7 +30,6 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
    use: {
     baseURL: process.env.BASE_URL,
-    headless: process.env.CI ? true : false,
     // screenshot: 'only-on-failure',
     // video: 'retain-on-failure',
 

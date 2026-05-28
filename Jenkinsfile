@@ -1,64 +1,52 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush() // auto trigger setiap push ke GitHub
-    }
-
-    environment {
-        CI = 'true' // headless mode
-    }
-
     stages {
-
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Setup ENV') {
-            steps {
-                withCredentials([file(credentialsId: 'ecommerce-env', variable: 'ENV_FILE')]) {
-                    bat 'copy %ENV_FILE% .env'
-                }
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
                 bat 'npm install'
-                bat 'npx playwright install --with-deps'
             }
         }
-
+        stage('Install Playwright Browsers') {
+            steps {
+                bat 'npx playwright install'
+            }
+        }
         stage('Run Playwright Tests') {
             steps {
-                bat 'npx playwright test --reporter=html'
+                withCredentials([file(credentialsId: 'ecommerce-env', variable: 'ENV_FILE')]) {
+                    bat 'copy %ENV_FILE% .env'
+                    bat 'npx playwright test'
+                }
             }
         }
-
-        stage('Publish Report') {
-            steps {
-                publishHTML([
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Report'
-                ])
-            }
-        }
-
     }
 
     post {
         always {
             echo 'Pipeline selesai!'
+            allure([
+                includeProperties: false,
+                jdk: '',
+                properties: [],
+                reportBuildPolicy: 'ALWAYS',
+                results: [[path: 'allure-results']]
+            ])
+
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright Test Report'
+            ])
+        }
+        success {
+            echo 'Semua test PASSED!'
         }
         failure {
-            echo 'Ada test yang gagal!'
+            echo 'Ada test yang FAILED!'
         }
     }
 }
